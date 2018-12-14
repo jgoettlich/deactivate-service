@@ -11,16 +11,27 @@ namespace DeactivationService.Services
 	public class CustomerService
 	{
 		GetCustomerListProc getCustomerListProc;
+		GetCustomerProc getCustomerProc;
 
 		public CustomerService(IConfiguration configuration)
 		{
 			var connString = configuration.GetConnectionString("mainDatabase");
 			getCustomerListProc = new GetCustomerListProc(connString);
+			getCustomerProc = new GetCustomerProc(connString);
 		}
 
 		public List<Customer> GetCustomerList(int page, int pageSize, string query)
 		{
 			return getCustomerListProc.Execute(page, pageSize, query);
+		}
+
+		public Customer GetCustomer(int companyId)
+		{
+			List<Customer> cList = getCustomerProc.Execute(companyId);
+			if(cList != null && cList.Count > 0)
+				return cList[0];
+
+			return new Customer();
 		}
 
 		public CustomerInfo GetCustomerInfo(int companyId)
