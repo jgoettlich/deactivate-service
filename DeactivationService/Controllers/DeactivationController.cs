@@ -57,5 +57,23 @@ namespace DeactivationService.Controllers
 
 			return new ObjectResult(responseList);
 		}
+
+		[HttpPost]
+		[ActionName("cancelRequest")]
+		public IActionResult CancelRequest([FromBody] Device request)
+		{
+			bool response = deactivationService.CancelRequest(request.cid, request.dsn);
+
+			return new ObjectResult(response);
+		}
+
+		[HttpPost]
+		[ActionName("updateStatus")]
+		public IActionResult UpdateStatus([FromBody] DeactivateReport request)
+		{
+			bool response = deactivationService.UpdateRequestStatus(request.cid, request.dsn, request.status);
+
+			return new ObjectResult(response);
+		}
 	}
 }
