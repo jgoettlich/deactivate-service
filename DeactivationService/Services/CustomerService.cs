@@ -20,18 +20,18 @@ namespace DeactivationService.Services
 			getCustomerProc = new GetCustomerProc(connString);
 		}
 
-		public List<Customer> GetCustomerList(int page, int pageSize, string query)
+		public List<Company> GetCustomerList(int page, int pageSize, string query)
 		{
 			return getCustomerListProc.Execute(page, pageSize, query);
 		}
 
-		public Customer GetCustomer(int companyId)
+		public Company GetCustomer(int companyId)
 		{
-			List<Customer> cList = getCustomerProc.Execute(companyId);
+			List<Company> cList = getCustomerProc.Execute(companyId);
 			if(cList != null && cList.Count > 0)
 				return cList[0];
 
-			return new Customer();
+			return new Company();
 		}
 
 		public CustomerInfo GetCustomerInfo(int companyId)

@@ -15,6 +15,7 @@ namespace DeactivationService.Procs
 
 		public List<Device> Execute(int cid, string trucknum)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", cid);
 			this.SqlParams.Add("@stringTrucknum", trucknum);
 

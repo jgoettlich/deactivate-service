@@ -35,7 +35,7 @@ namespace DeactivationService.Procs
 					sqlCmd.CommandType = CommandType.StoredProcedure;
 					foreach (KeyValuePair<string, object> p in SqlParams) {
 						string pName = (p.Key.StartsWith("@"))? p.Key : "@" + p.Key;
-						sqlCmd.Parameters.AddWithValue(pName, p.Value);
+						sqlCmd.Parameters.AddWithValue(pName, (p.Value ?? DBNull.Value));
 					}
 					
 					sqlConn.Open();

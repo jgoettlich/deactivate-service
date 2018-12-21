@@ -7,15 +7,17 @@ namespace DeactivationService.Models
 {
 	public class DeactivateResponse
 	{
+		public int? dsn { get; set; }
 		public string trucknum { get; set; }
-		public string success { get; set; }
+		public bool success { get; set; }
 
 		public DeactivateResponse() { }
 
-		public DeactivateResponse(string trucknum, bool success)
+		public DeactivateResponse(int? dsn, string trucknum, bool success)
 		{
+			this.dsn = dsn;
 			this.trucknum = trucknum;
-			this.success = (success) ? "Success" : "Failed";
+			this.success = success;
 		}
 	}
 }

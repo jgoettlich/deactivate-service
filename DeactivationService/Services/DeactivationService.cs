@@ -13,7 +13,9 @@ namespace DeactivationService.Services
 		CreateDeactivateRequestProc		createDeactivateRequestProc;
 		GetDeactivationRequestListProc	getDeactivationRequestListProc;
 		CancelDeactivateRequestProc		cancelDeactivateRequestProc;
-		UpdateRequestStatusProc			updateRequestStatusProc;
+		UpdateRequestProc				updateRequestProc;
+		AddDeviceToRequestProc			addDeviceToRequestProc;
+		GetRequestDeviceListProc		getRequestDeviceListProc;
 
 		public DeviceDeactivationService(IConfiguration configuration)
 		{
@@ -22,19 +24,42 @@ namespace DeactivationService.Services
 			createDeactivateRequestProc		= new CreateDeactivateRequestProc(connString);
 			getDeactivationRequestListProc	= new GetDeactivationRequestListProc(connString);
 			cancelDeactivateRequestProc		= new CancelDeactivateRequestProc(connString);
-			updateRequestStatusProc			= new UpdateRequestStatusProc(connString);
+			updateRequestProc				= new UpdateRequestProc(connString);
+			addDeviceToRequestProc			= new AddDeviceToRequestProc(connString);
+			getRequestDeviceListProc		= new GetRequestDeviceListProc(connString);
 		}
 
-		public bool DeactivatDevice(int vid, int cid, string trucknum, int dsn, int status, int userId)
+		public List<DeactivateResponse> Deactivate(DeactivateRequest request)
 		{
-			List<bool> resp = createDeactivateRequestProc.Execute(vid, cid, trucknum, dsn, status, userId);
+			List<string> resp = createDeactivateRequestProc.Execute(request.cid, request.status, request.reason, request.userId, request.cm_notes, request.cust_notes);
+			List<DeactivateResponse> deviceResp = new List<DeactivateResponse>();
+			string requestId = (resp?.Count > 0)? resp[0] : null;
 
-			return (resp?.Count > 0) ? resp[0] : false;
+			foreach (Device d in request.deviceList) {
+				if (requestId != null)
+				{
+					bool success = addDeviceToRequestProc.Execute(requestId, d.cid, d.dsn, d.vid, d.trucknum, d.status, d.reason);
+					deviceResp.Add(new DeactivateResponse(d.dsn, d.trucknum, success));
+				}
+				else
+				{
+					deviceResp.Add(new DeactivateResponse(d.dsn, d.trucknum, false));
+				}
+			}
+			
+			return deviceResp;
 		}
 
-		public List<DeactivateReport> GetDeactivationReport(int cid, int page, int pageSize, bool showOnlyPending)
+		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, bool showOnlyPending)
 		{
-			return getDeactivationRequestListProc.Execute(cid, page, pageSize, showOnlyPending);
+			List<DeactivateRequest> requestList = getDeactivationRequestListProc.Execute(cid, page, pageSize, showOnlyPending);
+			foreach(DeactivateRequest r in requestList)
+			{
+				List<Device> deviceList = getRequestDeviceListProc.Execute(r.requestId.ToString());
+				r.deviceList = deviceList;
+			}
+
+			return requestList;
 		}
 
 		public bool CancelRequest(int cid, int dsn)
@@ -44,9 +69,9 @@ namespace DeactivationService.Services
 			return (respList?.Count > 0)? respList[0] : false;
 		}
 
-		public bool UpdateRequestStatus(int cid, int dsn, int status)
+		public bool UpdateRequest(string requestId, int status, int reason, string cmNotes, string custNotes)
 		{
-			List<bool> respList = updateRequestStatusProc.Execute(cid, dsn, status);
+			List<bool> respList = updateRequestProc.Execute(requestId, status, reason, cmNotes, custNotes);
 
 			return (respList?.Count > 0) ? respList[0] : false;
 		}

@@ -30,7 +30,7 @@ namespace DeactivationService.Controllers
 			{
 				query = "";
 			}
-			List<Customer> customers = customerService.GetCustomerList(page, pageSize, query);
+			List<Company> customers = customerService.GetCustomerList(page, pageSize, query);
 			return new ObjectResult(customers);
 		}
 
@@ -38,7 +38,7 @@ namespace DeactivationService.Controllers
 		[ActionName("getCustomer")]
 		public IActionResult GetCustomer(int companyId)
 		{
-			Customer customer = customerService.GetCustomer(companyId);
+			Company customer = customerService.GetCustomer(companyId);
 			return new ObjectResult(customer);
 		}
 

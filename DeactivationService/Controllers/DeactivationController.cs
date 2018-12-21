@@ -26,7 +26,7 @@ namespace DeactivationService.Controllers
 		[ActionName("getReport")]
 		public IActionResult GetReport(int companyId, int page, int pageSize, bool onlyPending)
 		{
-			List<DeactivateReport> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending);
+			List<DeactivateRequest> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending);
 			return new ObjectResult(report);
 		}
 
@@ -37,23 +37,7 @@ namespace DeactivationService.Controllers
 			// Verify the user request
 			request.userId = 1298352; // Replace this with converted session Id
 
-			// Swap the DSNs
-			List<DeactivateResponse> responseList = new List<DeactivateResponse>();
-			List<Device> deviceList = request.deviceList;
-			for (int i = 0; i < deviceList.Count; i++)
-			{
-				Device device = deviceList[i];
-				Boolean response = deactivationService.DeactivatDevice(
-						device.vid,
-						device.cid,
-						device.trucknum,
-						device.dsn,
-						device.status,
-						request.userId
-				);
-				DeactivateResponse deactivateResponse = new DeactivateResponse(device.trucknum, response);
-				responseList.Add(deactivateResponse);
-			}
+			List<DeactivateResponse> responseList = deactivationService.Deactivate(request);
 
 			return new ObjectResult(responseList);
 		}
@@ -62,16 +46,32 @@ namespace DeactivationService.Controllers
 		[ActionName("cancelRequest")]
 		public IActionResult CancelRequest([FromBody] Device request)
 		{
-			bool response = deactivationService.CancelRequest(request.cid, request.dsn);
+			if (request.cid == null || request.dsn == null)
+			{
+				return new ObjectResult(false);
+			}
+
+			bool response = deactivationService.CancelRequest(Convert.ToInt32(request.cid), Convert.ToInt32(request.dsn));
 
 			return new ObjectResult(response);
 		}
 
 		[HttpPost]
-		[ActionName("updateStatus")]
-		public IActionResult UpdateStatus([FromBody] DeactivateReport request)
+		[ActionName("updateRequest")]
+		public IActionResult UpdateRequest([FromBody] DeactivateRequest request)
 		{
-			bool response = deactivationService.UpdateRequestStatus(request.cid, request.dsn, request.status);
+			if (request == null)
+			{
+				return new ObjectResult(false);
+			}
+
+			bool response = deactivationService.UpdateRequest(
+				request.requestId.ToString(), 
+				Convert.ToInt32(request.status),
+				Convert.ToInt32(request.reason),
+				request.cm_notes,
+				request.cust_notes
+				);
 
 			return new ObjectResult(response);
 		}

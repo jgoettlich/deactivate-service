@@ -26,7 +26,16 @@ namespace DeactivationService.Services
 
 		public List<Device> GetDeviceFromTrucknum(int cid, string trucknum)
 		{
-			return getDeviceFromTrucknumProc.Execute(cid, trucknum);
+			List<Device> deviceList = getDeviceFromTrucknumProc.Execute(cid, trucknum);
+			if (deviceList.Count == 0)
+			{
+				Device d = new Device();
+				d.cid = cid;
+				d.trucknum = trucknum;
+
+				deviceList.Add(d);
+			}
+			return deviceList;
 		}
 	}
 }

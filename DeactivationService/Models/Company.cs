@@ -5,9 +5,15 @@ using System.Threading.Tasks;
 
 namespace DeactivationService.Models
 {
-	public class Customer : Object
+	public class Company : Object
 	{
-		public int cid { get; set; }
+		public int? cid { get; set; }
 		public string companyName { get; set; }
+
+		public Company()
+		{
+			cid			= null;
+			companyName = null;
+		}
 	}
 }

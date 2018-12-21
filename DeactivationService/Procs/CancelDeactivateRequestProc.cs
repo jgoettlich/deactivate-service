@@ -14,6 +14,7 @@ namespace DeactivationService.Procs
 
 		public List<bool> Execute(int cid, int dsn)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", cid);
 			this.SqlParams.Add("@intDsn", dsn);
 

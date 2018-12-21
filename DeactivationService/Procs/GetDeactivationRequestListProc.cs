@@ -13,16 +13,17 @@ namespace DeactivationService.Procs
 		{
 		}
 
-		public List<DeactivateReport> Execute(int cid, int page, int pageSize, bool showOnlyPending)
+		public List<DeactivateRequest> Execute(int cid, int page, int pageSize, bool showOnlyPending)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", cid);
 			this.SqlParams.Add("@intPage", page);
 			this.SqlParams.Add("@intPageSize", pageSize);
 			this.SqlParams.Add("@bitOnlyPending", showOnlyPending);
 
 			DataTable dt = base.Execute();
-			IEnumerable<DeactivateReport> requests = base.MapData(dt, typeof(DeactivateReport)).Cast<DeactivateReport>();
-			List<DeactivateReport> reportList = requests.ToList();
+			IEnumerable<DeactivateRequest> requests = base.MapData(dt, typeof(DeactivateRequest)).Cast<DeactivateRequest>();
+			List<DeactivateRequest> reportList = requests.ToList();
 
 			return reportList;
 		}

@@ -12,24 +12,25 @@ namespace DeactivationService.Procs
 		{
 		}
 
-		public List<bool> Execute(int vid, int cid, string trucknum, int dsn, int status, int userId)
+		public List<string> Execute(int cid, int? status, int? reason, int? userId, string cmNotes, string custNotes)
 		{
-			this.SqlParams.Add("@intvid", vid);
-			this.SqlParams.Add("@intcid", cid);
-			this.SqlParams.Add("@strtrucknum", trucknum);
-			this.SqlParams.Add("@intdsn", dsn);
+			this.SqlParams.Clear();
+			this.SqlParams.Add("@intCid", cid);
 			this.SqlParams.Add("@intstatus", status);
-			this.SqlParams.Add("@intuserId", userId);
+			this.SqlParams.Add("@intReason", reason);
+			this.SqlParams.Add("@intuserId", userId); 
+			this.SqlParams.Add("@strCmNotes", cmNotes);
+			this.SqlParams.Add("@strCustNotes", custNotes);
 
-			DataTable dt = base.Execute();
-			List<bool> successList = new List<bool>();
+			 DataTable dt = base.Execute();
+			List<string> requestIdList = new List<string>();
 			foreach (DataRow row in dt.Rows)
 			{
-				bool val = (row[0] == DBNull.Value) ? false : Convert.ToBoolean(row[0]);
-				successList.Add(val);
+				string requestId = (row[0] == DBNull.Value) ? null : Convert.ToString(row[0]);
+				requestIdList.Add(requestId);
 			}
 
-			return successList;
+			return requestIdList;
 		}
 	}
 }

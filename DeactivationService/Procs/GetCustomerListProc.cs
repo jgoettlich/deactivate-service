@@ -15,15 +15,16 @@ namespace DeactivationService.Procs
 			
 		}
 
-		public List<Customer> Execute(int page, int pageSize, string query)
+		public List<Company> Execute(int page, int pageSize, string query)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intPage", page);
 			this.SqlParams.Add("@intPageSize", pageSize);
 			this.SqlParams.Add("@query", query);
 
 			DataTable dt = base.Execute();
-			IEnumerable<Customer> customers = base.MapData(dt, typeof(Customer)).Cast<Customer>();
-			List<Customer> customerList = customers.ToList();
+			IEnumerable<Company> customers = base.MapData(dt, typeof(Company)).Cast<Company>();
+			List<Company> customerList = customers.ToList();
 
 			return customerList;
 		}

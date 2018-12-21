@@ -16,6 +16,7 @@ namespace DeactivationService.Procs
 
 		public List<Device> Execute(int cid, int page, int pageSize)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", cid);
 			this.SqlParams.Add("@intPage", page);
 			this.SqlParams.Add("@intPageSize", pageSize);

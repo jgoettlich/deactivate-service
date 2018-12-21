@@ -14,13 +14,14 @@ namespace DeactivationService.Procs
 
 		}
 
-		public List<Customer> Execute(int companyId)
+		public List<Company> Execute(int companyId)
 		{
+			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", companyId);
 
 			DataTable dt = base.Execute();
-			IEnumerable<Customer> customers = base.MapData(dt, typeof(Customer)).Cast<Customer>();
-			List<Customer> customerList = customers.ToList();
+			IEnumerable<Company> customers = base.MapData(dt, typeof(Company)).Cast<Company>();
+			List<Company> customerList = customers.ToList();
 
 			return customerList;
 		}
