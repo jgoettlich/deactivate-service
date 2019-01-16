@@ -14,7 +14,7 @@ namespace DeactivationService.Procs
 
 		}
 
-		public List<bool> Execute(string requestId, int status, int reason, string cmNotes, string custNotes)
+		public List<bool> Execute(string requestId, int status, int reason, string cmNotes, string custNotes, decimal fee)
 		{
 			this.SqlParams.Clear();
 			this.SqlParams.Add("@requestId", requestId);
@@ -22,10 +22,10 @@ namespace DeactivationService.Procs
 			this.SqlParams.Add("@intReason", reason);
 			this.SqlParams.Add("@strCmNotes", cmNotes);
 			this.SqlParams.Add("@strCustNotes", custNotes);
+			this.SqlParams.Add("@intFee", fee);
 
 			DataTable dt = base.Execute();
-			IEnumerable<bool> reponse = base.MapData(dt, typeof(bool)).Cast<bool>();
-			List<bool> responseList = reponse.ToList();
+			List<bool> responseList = base.MapBool(dt);
 
 			return responseList;
 		}

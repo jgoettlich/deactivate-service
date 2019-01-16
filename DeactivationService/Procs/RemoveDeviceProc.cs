@@ -6,15 +6,17 @@ using System.Data;
 
 namespace DeactivationService.Procs
 {
-	public class CancelDeactivateRequestProc: AbstractStoredProcCall
+	public class RemoveDeviceProc : AbstractStoredProcCall
 	{
-		public CancelDeactivateRequestProc(string connectionStr) : base("deactivate_cancel_request", connectionStr)
-		{ 
+		public RemoveDeviceProc(string connectionStr) : base("deactivate_remove_device_from_request", connectionStr)
+		{
 		}
 
-		public List<bool> Execute(string requestId)
+		public List<bool> Execute(int cid, int dsn, string requestId)
 		{
 			this.SqlParams.Clear();
+			this.SqlParams.Add("@intCid", cid);
+			this.SqlParams.Add("@intDsn", dsn);
 			this.SqlParams.Add("@requestId", requestId);
 
 			DataTable dt = base.Execute();

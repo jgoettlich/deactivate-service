@@ -24,8 +24,7 @@ namespace DeactivationService.Procs
 			this.SqlParams.Add("@intReason", reason);
 
 			DataTable dt = base.Execute();
-			IEnumerable<bool> reponse = base.MapData(dt, typeof(bool)).Cast<bool>();
-			List<bool> responseList = reponse.ToList();
+			List<bool> responseList = base.MapBool(dt);
 
 			if (responseList != null && responseList.Count > 0) { 
 				return responseList[0];	

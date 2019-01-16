@@ -7,12 +7,14 @@ namespace DeactivationService.Models
 {
 	public class Device
 	{
-		public int? cid { get; set; }
-		public int? dsn { get; set; }
-		public int vid { get; set; }
-		public string trucknum { get; set; }
-		public int? status { get; set; }
-		public int? reason { get; set; }
+		public int?		cid			{ get; set; }
+		public int?		dsn			{ get; set; }
+		public int		vid			{ get; set; }
+		public string	trucknum	{ get; set; }
+		public int?		status		{ get; set; }
+		public int?		reason		{ get; set; }
+		public string	requestId	{ get; set; }
+		public decimal?	fee			{ get; set; }
 
 		public Device()
 		{
@@ -21,6 +23,8 @@ namespace DeactivationService.Models
 			trucknum	= null;
 			status		= 0;
 			reason		= null;
+			requestId	= null;
+			fee			= null;
 		}
 	}
 }

@@ -91,5 +91,19 @@ namespace DeactivationService.Procs
 
 			return values;
 		}
+
+		protected List<bool> MapBool(DataTable dt)
+		{
+			List<bool> values = new List<bool>();
+			if (dt == null) { return values; }
+			
+			foreach (DataRow row in dt.Rows)
+			{
+				bool val = Convert.ToBoolean(row[0]);
+				values.Add(val);
+			}
+
+			return values;
+		}
 	}
 }

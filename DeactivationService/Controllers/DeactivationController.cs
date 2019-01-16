@@ -24,10 +24,33 @@ namespace DeactivationService.Controllers
 
 		[HttpGet]
 		[ActionName("getReport")]
-		public IActionResult GetReport(int companyId, int page, int pageSize, bool onlyPending)
+		public IActionResult GetReport(int companyId, int page, int pageSize, 
+			bool onlyPending, string sortColumn, bool sortAsc)
 		{
-			List<DeactivateRequest> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending);
+			string[] validSortColumns = { "requestDate", "status", "reason", "completedDate", "username" };
+			if(!validSortColumns.Contains(sortColumn))
+			{
+				sortColumn = "requestDate";
+			}
+			List<DeactivateRequest> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending, sortColumn, sortAsc);
 			return new ObjectResult(report);
+		}
+
+		[HttpGet]
+		[ActionName("getRequest")]
+		public IActionResult GetRequest(string requestId)
+		{
+			DeactivateRequest report = deactivationService.GetDeactivationRequest(requestId);
+			return new ObjectResult(report);
+		}
+
+		[HttpGet]
+		[ActionName("getStatusSummary")]
+		public IActionResult GetStatusSummary(int companyId)
+		{
+			List<StatusSummary> summary = deactivationService.GetStatusSummary(companyId);
+
+			return new ObjectResult(summary);
 		}
 
 		[HttpPost]
@@ -43,15 +66,28 @@ namespace DeactivationService.Controllers
 		}
 
 		[HttpPost]
-		[ActionName("cancelRequest")]
-		public IActionResult CancelRequest([FromBody] Device request)
+		[ActionName("removeDeviceFromRequest")]
+		public IActionResult RemoveDeviceFromRequest([FromBody] Device device)
 		{
-			if (request.cid == null || request.dsn == null)
+			if (device == null || device.cid == null || device.dsn == null || device.requestId == null)
 			{
 				return new ObjectResult(false);
 			}
 
-			bool response = deactivationService.CancelRequest(Convert.ToInt32(request.cid), Convert.ToInt32(request.dsn));
+			bool response = deactivationService.RemoveDeviceFromRequest(Convert.ToInt32(device.cid), Convert.ToInt32(device.dsn), device.requestId);
+			return new ObjectResult(response);
+		}
+
+		[HttpPost]
+		[ActionName("cancelRequest")]
+		public IActionResult CancelRequest([FromBody] DeactivateRequest request)
+		{
+			if (request.requestId == null || request.requestId == null)
+			{
+				return new ObjectResult(false);
+			}
+
+			bool response = deactivationService.CancelRequest(request.requestId.ToString());
 
 			return new ObjectResult(response);
 		}
@@ -70,9 +106,18 @@ namespace DeactivationService.Controllers
 				Convert.ToInt32(request.status),
 				Convert.ToInt32(request.reason),
 				request.cm_notes,
-				request.cust_notes
+				request.cust_notes,
+				Convert.ToDecimal(request.fee)
 				);
 
+			return new ObjectResult(response);
+		}
+
+		[HttpPost]
+		[ActionName("updateDeviceFees")]
+		public IActionResult UpdateDeviceFees([FromBody] List<Device> deviceList)
+		{
+			List<bool> response = deactivationService.UpdateDeviceFees(deviceList);
 			return new ObjectResult(response);
 		}
 	}

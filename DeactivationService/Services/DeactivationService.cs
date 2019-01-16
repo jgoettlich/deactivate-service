@@ -16,6 +16,10 @@ namespace DeactivationService.Services
 		UpdateRequestProc				updateRequestProc;
 		AddDeviceToRequestProc			addDeviceToRequestProc;
 		GetRequestDeviceListProc		getRequestDeviceListProc;
+		GetDeactivateRequestProc		getDeactivateRequestProc;
+		RemoveDeviceProc				removeDeviceProc;
+		UpdateDeviceFeeProc				updateDeviceFeeProc;
+		StatusSummaryProc				statusSummaryProc;
 
 		public DeviceDeactivationService(IConfiguration configuration)
 		{
@@ -27,11 +31,22 @@ namespace DeactivationService.Services
 			updateRequestProc				= new UpdateRequestProc(connString);
 			addDeviceToRequestProc			= new AddDeviceToRequestProc(connString);
 			getRequestDeviceListProc		= new GetRequestDeviceListProc(connString);
+			getDeactivateRequestProc		= new GetDeactivateRequestProc(connString);
+			removeDeviceProc				= new RemoveDeviceProc(connString);
+			updateDeviceFeeProc				= new UpdateDeviceFeeProc(connString);
+			statusSummaryProc				= new StatusSummaryProc(connString);
 		}
 
 		public List<DeactivateResponse> Deactivate(DeactivateRequest request)
 		{
-			List<string> resp = createDeactivateRequestProc.Execute(request.cid, request.status, request.reason, request.userId, request.cm_notes, request.cust_notes);
+			List<string> resp = createDeactivateRequestProc.Execute(request.cid, 
+				request.status, 
+				request.reason, 
+				request.userId, 
+				request.cm_notes, 
+				request.cust_notes,
+				request.requestedDate
+				);
 			List<DeactivateResponse> deviceResp = new List<DeactivateResponse>();
 			string requestId = (resp?.Count > 0)? resp[0] : null;
 
@@ -50,9 +65,9 @@ namespace DeactivationService.Services
 			return deviceResp;
 		}
 
-		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, bool showOnlyPending)
+		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, bool showOnlyPending, string sortColumn, bool sortAsc)
 		{
-			List<DeactivateRequest> requestList = getDeactivationRequestListProc.Execute(cid, page, pageSize, showOnlyPending);
+			List<DeactivateRequest> requestList = getDeactivationRequestListProc.Execute(cid, page, pageSize, showOnlyPending, sortColumn, sortAsc);
 			foreach(DeactivateRequest r in requestList)
 			{
 				List<Device> deviceList = getRequestDeviceListProc.Execute(r.requestId.ToString());
@@ -62,18 +77,52 @@ namespace DeactivationService.Services
 			return requestList;
 		}
 
-		public bool CancelRequest(int cid, int dsn)
+		public DeactivateRequest GetDeactivationRequest(string requestId)
 		{
-			List<bool> respList = cancelDeactivateRequestProc.Execute(cid, dsn);
+			DeactivateRequest request = getDeactivateRequestProc.Execute(requestId);
+			List<Device> deviceList = getRequestDeviceListProc.Execute(requestId);
+			request.deviceList = deviceList;
+
+			return request;
+		}
+
+		public List<StatusSummary> GetStatusSummary(int companyId)
+		{
+			return statusSummaryProc.Execute(companyId);
+		}
+
+		public bool RemoveDeviceFromRequest(int cid, int dsn, string requestId)
+		{
+			List<bool> respList = removeDeviceProc.Execute(cid, dsn, requestId);
+
+			return (respList?.Count > 0) ? respList[0] : false;
+		}
+
+		public bool CancelRequest(string requestId)
+		{
+			List<bool> respList = cancelDeactivateRequestProc.Execute(requestId);
 
 			return (respList?.Count > 0)? respList[0] : false;
 		}
 
-		public bool UpdateRequest(string requestId, int status, int reason, string cmNotes, string custNotes)
+		public bool UpdateRequest(string requestId, int status, int reason, string cmNotes, string custNotes, decimal fee)
 		{
-			List<bool> respList = updateRequestProc.Execute(requestId, status, reason, cmNotes, custNotes);
+			List<bool> respList = updateRequestProc.Execute(requestId, status, reason, cmNotes, custNotes, fee);
 
 			return (respList?.Count > 0) ? respList[0] : false;
+		}
+
+		public List<bool> UpdateDeviceFees(List<Device> deviceList)
+		{
+			List<bool> respList = new List<bool>();
+			foreach(Device d in deviceList)
+			{ 
+				bool resp = updateDeviceFeeProc.Execute(d.requestId, Convert.ToInt32(d.cid), Convert.ToInt32(d.dsn), Convert.ToDecimal(d.fee));
+				respList.Add(resp);
+			}
+				
+
+			return respList;
 		}
 	}
 }

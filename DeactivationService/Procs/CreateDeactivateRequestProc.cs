@@ -12,7 +12,7 @@ namespace DeactivationService.Procs
 		{
 		}
 
-		public List<string> Execute(int cid, int? status, int? reason, int? userId, string cmNotes, string custNotes)
+		public List<string> Execute(int cid, int? status, int? reason, int? userId, string cmNotes, string custNotes, DateTime? requestedDate)
 		{
 			this.SqlParams.Clear();
 			this.SqlParams.Add("@intCid", cid);
@@ -21,8 +21,9 @@ namespace DeactivationService.Procs
 			this.SqlParams.Add("@intuserId", userId); 
 			this.SqlParams.Add("@strCmNotes", cmNotes);
 			this.SqlParams.Add("@strCustNotes", custNotes);
+			this.SqlParams.Add("@requestedDate", requestedDate);
 
-			 DataTable dt = base.Execute();
+			DataTable dt = base.Execute();
 			List<string> requestIdList = new List<string>();
 			foreach (DataRow row in dt.Rows)
 			{

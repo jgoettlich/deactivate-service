@@ -13,10 +13,12 @@ namespace DeactivationService.Models
 		public int cid { get; set; }
 		public int? reason { get; set; }
 		public int? status { get; set; }
+		public decimal? fee { get; set; }
 		public string cm_notes { get; set; }
 		public string cust_notes { get; set; }
 		public string username { get; set; }
-		public DateTime? requestDate { get; set; }
+		public DateTime? createdDate { get; set; }
+		public DateTime? requestedDate { get; set; }
 		public DateTime? completedDate { get; set; }
 		public List<Device> deviceList { get; set; }
 
@@ -27,8 +29,10 @@ namespace DeactivationService.Models
 			status			= null;
 			cm_notes		= null;
 			cust_notes		= null;
-			requestDate		= null;
+			createdDate		= null;
+			requestedDate	= null;
 			completedDate	= null;
+			fee				= null;
 		}
 	}
 }

@@ -50,5 +50,13 @@ namespace DeactivationService.Controllers
 			CustomerInfo customer = customerService.GetCustomerInfo(companyId);
 			return new ObjectResult(customer);
 		}
+
+		[HttpGet]
+		[ActionName("getCustomerInfo")]
+		public IActionResult GetCustomerInfo(string sessionId)
+		{
+
+			return new ObjectResult(true);
+		}
 	}
 }
