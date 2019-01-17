@@ -25,14 +25,14 @@ namespace DeactivationService.Controllers
 		[HttpGet]
 		[ActionName("getReport")]
 		public IActionResult GetReport(int companyId, int page, int pageSize, 
-			bool onlyPending, string sortColumn, bool sortAsc)
+			bool onlyPending, string sortColumn, bool sortAsc, string filterColumn, string filterValue)
 		{
 			string[] validSortColumns = { "requestDate", "status", "reason", "completedDate", "username" };
 			if(!validSortColumns.Contains(sortColumn))
 			{
 				sortColumn = "requestDate";
 			}
-			List<DeactivateRequest> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending, sortColumn, sortAsc);
+			List<DeactivateRequest> report = deactivationService.GetDeactivationReport(companyId, page, pageSize, onlyPending, sortColumn, sortAsc, filterColumn, filterValue);
 			return new ObjectResult(report);
 		}
 

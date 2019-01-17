@@ -20,6 +20,7 @@ namespace DeactivationService.Services
 		RemoveDeviceProc				removeDeviceProc;
 		UpdateDeviceFeeProc				updateDeviceFeeProc;
 		StatusSummaryProc				statusSummaryProc;
+		GetRequestReportByStatusProc	getRequestReportByStatusProc;
 
 		public DeviceDeactivationService(IConfiguration configuration)
 		{
@@ -35,6 +36,7 @@ namespace DeactivationService.Services
 			removeDeviceProc				= new RemoveDeviceProc(connString);
 			updateDeviceFeeProc				= new UpdateDeviceFeeProc(connString);
 			statusSummaryProc				= new StatusSummaryProc(connString);
+			getRequestReportByStatusProc	= new GetRequestReportByStatusProc(connString);
 		}
 
 		public List<DeactivateResponse> Deactivate(DeactivateRequest request)
@@ -65,9 +67,28 @@ namespace DeactivationService.Services
 			return deviceResp;
 		}
 
-		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, bool showOnlyPending, string sortColumn, bool sortAsc)
+		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, 
+			bool showOnlyPending, string sortColumn, 
+			bool sortAsc, string filterColumn, string filterValue)
 		{
-			List<DeactivateRequest> requestList = getDeactivationRequestListProc.Execute(cid, page, pageSize, showOnlyPending, sortColumn, sortAsc);
+			List<DeactivateRequest> requestList = new List<DeactivateRequest>();
+			// Validate the filter column
+			if(filterColumn?.ToLower() == "status")
+			{
+				int filter = 0;
+				if(!Int32.TryParse(filterValue, out filter))
+				{
+					return requestList;
+				}
+				requestList = getRequestReportByStatusProc.Execute(cid, page, pageSize, 
+				sortColumn, sortAsc, filter);
+			}
+			else
+			{
+				requestList = getDeactivationRequestListProc.Execute(cid, page, pageSize, 
+				showOnlyPending, sortColumn, sortAsc);
+			}
+			
 			foreach(DeactivateRequest r in requestList)
 			{
 				List<Device> deviceList = getRequestDeviceListProc.Execute(r.requestId.ToString());
