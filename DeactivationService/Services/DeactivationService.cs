@@ -21,6 +21,8 @@ namespace DeactivationService.Services
 		UpdateDeviceFeeProc				updateDeviceFeeProc;
 		StatusSummaryProc				statusSummaryProc;
 		GetRequestReportByStatusProc	getRequestReportByStatusProc;
+		UpdateRequestStatusProc			updateRequestStatusProc;
+		UpdateRequestReasonProc			updateRequestReasonProc;
 
 		public DeviceDeactivationService(IConfiguration configuration)
 		{
@@ -37,11 +39,13 @@ namespace DeactivationService.Services
 			updateDeviceFeeProc				= new UpdateDeviceFeeProc(connString);
 			statusSummaryProc				= new StatusSummaryProc(connString);
 			getRequestReportByStatusProc	= new GetRequestReportByStatusProc(connString);
+			updateRequestStatusProc			= new UpdateRequestStatusProc(connString);
+			updateRequestReasonProc			= new UpdateRequestReasonProc(connString);
 		}
 
-		public List<DeactivateResponse> Deactivate(DeactivateRequest request)
+		public string Deactivate(DeactivateRequest request)
 		{
-			List<string> resp = createDeactivateRequestProc.Execute(request.cid, 
+			string requestId = createDeactivateRequestProc.Execute(request.cid, 
 				request.status, 
 				request.reason, 
 				request.userId, 
@@ -49,22 +53,15 @@ namespace DeactivationService.Services
 				request.cust_notes,
 				request.requestedDate
 				);
-			List<DeactivateResponse> deviceResp = new List<DeactivateResponse>();
-			string requestId = (resp?.Count > 0)? resp[0] : null;
 
 			foreach (Device d in request.deviceList) {
 				if (requestId != null)
 				{
 					bool success = addDeviceToRequestProc.Execute(requestId, d.cid, d.dsn, d.vid, d.trucknum, d.status, d.reason);
-					deviceResp.Add(new DeactivateResponse(d.dsn, d.trucknum, success));
-				}
-				else
-				{
-					deviceResp.Add(new DeactivateResponse(d.dsn, d.trucknum, false));
 				}
 			}
 			
-			return deviceResp;
+			return requestId;
 		}
 
 		public List<DeactivateRequest> GetDeactivationReport(int cid, int page, int pageSize, 
@@ -131,6 +128,16 @@ namespace DeactivationService.Services
 			List<bool> respList = updateRequestProc.Execute(requestId, status, reason, cmNotes, custNotes, fee);
 
 			return (respList?.Count > 0) ? respList[0] : false;
+		}
+
+		public bool UpdateRequestStatus(UpdateStatus update)
+		{
+			return updateRequestStatusProc.Execute(update);
+		}
+
+		public bool UpdateRequestReason(UpdateReason update)
+		{
+			return updateRequestReasonProc.Execute(update);
 		}
 
 		public List<bool> UpdateDeviceFees(List<Device> deviceList)

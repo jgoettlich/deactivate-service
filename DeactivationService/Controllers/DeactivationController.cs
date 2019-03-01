@@ -58,11 +58,12 @@ namespace DeactivationService.Controllers
 		public IActionResult DeactivateDevice([FromBody] DeactivateRequest request)
 		{
 			// Verify the user request
+			string authToken = Request.Headers["x-access-token"];
 			request.userId = 1298352; // Replace this with converted session Id
 
-			List<DeactivateResponse> responseList = deactivationService.Deactivate(request);
+			string requestId = deactivationService.Deactivate(request);
 
-			return new ObjectResult(responseList);
+			return new ObjectResult(requestId);
 		}
 
 		[HttpPost]
@@ -111,6 +112,24 @@ namespace DeactivationService.Controllers
 				);
 
 			return new ObjectResult(response);
+		}
+
+		[HttpPost]
+		[ActionName("updateRequestStatus")]
+		public StatusCodeResult UpdateRequestStatus(UpdateStatus update)
+		{
+			bool success = this.deactivationService.UpdateRequestStatus(update);
+
+			return (success)? StatusCode(200) : StatusCode(400);
+		}
+
+		[HttpPost]
+		[ActionName("updateRequestReason")]
+		public StatusCodeResult UpdateRequestReason(UpdateReason update)
+		{
+			bool success = this.deactivationService.UpdateRequestReason(update);
+
+			return (success)? StatusCode(200) : StatusCode(400);
 		}
 
 		[HttpPost]

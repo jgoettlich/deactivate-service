@@ -61,5 +61,34 @@ namespace DeactivationService.Services
 
 			return info;
 		}
+
+		public List<ContractData> GetContractData(int companyId)
+		{
+			List<ContractData> dataList = new List<ContractData>();
+
+			dataList = popFakeContract();
+
+			return dataList;
+		}
+
+		private List<ContractData> popFakeContract() 
+		{
+			string[] dateList = {"1/31/2019", "1/31/2020", "1/31/2021", "1/31/2022", "1/31/2019"};
+			string[] cType = { "Renewal or RPC", "Renewal or RPC", "Renewal or RPC", "Renewal or RPC", "MPA or Add-On" };
+			int[] term = { 9010, 2045, 650, 366, 8594 };
+
+			List<ContractData> dataList = new List<ContractData>();
+			for(int i=0;i<dateList.Length;i++)
+			{ 
+				ContractData data = new ContractData();
+				data.contractType = cType[i];
+				data.terms = term[i];
+				data.contractEnd = Convert.ToDateTime(dateList[i]);
+				data.month = 1;
+				dataList.Add(data);
+			}
+
+			return dataList;
+		}
 	}
 }

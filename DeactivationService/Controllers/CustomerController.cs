@@ -46,17 +46,26 @@ namespace DeactivationService.Controllers
 		[ActionName("getCustomerInfo")]
 		public IActionResult GetCustomerInfo(int companyId)
 		{
-			string authToken = Request.Headers["token"];
+			string authToken = Request.Headers["x-access-token"];
 			CustomerInfo customer = customerService.GetCustomerInfo(companyId);
 			return new ObjectResult(customer);
 		}
 
 		[HttpGet]
-		[ActionName("getCustomerInfo")]
+		[ActionName("getCustomerBySession")]
 		public IActionResult GetCustomerInfo(string sessionId)
 		{
 
 			return new ObjectResult(true);
+		}
+
+		
+		[HttpGet]
+		[ActionName("getCustomerContractData")]
+		public IActionResult GetCustomerContractData(int companyId)
+		{
+			List<ContractData> contractList = customerService.GetContractData(companyId);
+			return new ObjectResult(contractList);
 		}
 	}
 }
