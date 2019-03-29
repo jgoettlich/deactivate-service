@@ -9,7 +9,7 @@ namespace DeactivationService.Procs
 {
 	public class UpdateRequestReasonProc : AbstractStoredProcCall
 	{
-		public UpdateRequestReasonProc(string connStr): base("", connStr) { }
+		public UpdateRequestReasonProc(string connStr): base("deactivate_update_request_reason", connStr) { }
 
 		public bool Execute(UpdateReason update)
 		{

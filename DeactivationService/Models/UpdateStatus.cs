@@ -10,5 +10,6 @@ namespace DeactivationService.Models
 		public string	requestId	{ get; set; }
 		public int?		dsn			{ get; set; }
 		public int?		status		{ get; set; }
+		public int		cid			{ get; set; }
 	}
 }
